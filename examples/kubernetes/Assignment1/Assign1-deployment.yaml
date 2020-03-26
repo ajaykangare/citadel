@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  selector:
+    matchLabels:
+      run: my-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: my-nginx      
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: workdir
+          mountPath: /usr/share/nginx/html
+        livenessProbe:
+          httpGet:
+            path: /index.html
+            port: 80periodSeconds: 3  
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /index.html
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 3  
+      initContainers:
+      - name: install
+        image: busybox
+        command: ["/bin/sh","-c"]
+        args: ["touch /work-dir/index.html & echo 'hello World!' > /work-dir/index.html"]
+        volumeMounts:
+        - name: workdir
+          mountPath: "/work-dir"     
+      dnsPolicy: Default
+      volumes:
+      - name: workdir
+        emptyDir: {}
+
+

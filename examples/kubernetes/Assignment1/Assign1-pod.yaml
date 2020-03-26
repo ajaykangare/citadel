@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: workdir
+      mountPath: /usr/share/nginx/html
+    livenessProbe:
+      httpGet:
+        path: /index.html
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 5
+    readinessProbe:
+      httpGet:
+        path: /index.html
+        port: 80
+      initialDelaySeconds: 20
+  initContainers:
+  - name: install
+    image: busybox
+    command: ["/bin/sh","-c"]
+    args: ["touch /work-dir/index.html & echo 'hello World!' > /work-dir/index.html"]
+    volumeMounts:
+    - name: workdir
+      mountPath: "/work-dir"     
+  dnsPolicy: Default
+  volumes:
+  - name: workdir
+    emptyDir: {}
+

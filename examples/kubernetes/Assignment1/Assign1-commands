@@ -1,0 +1,33 @@
+Assignment: 
+	Deploy a Pod which serves a static file. The static file should be created when the Pod starts (init container). The pod is able to serve traffic only if the file exists. Gets restarted if the file is deleted. Also, configure liveness and readiness probes
+
+
+
+
+Create the deployment using file
+
+	kubectl -n mynginxlp apply -f ./my-nginx-livenessprobe.yaml
+
+Expose Service as NodePort:
+
+	kubectl -n mynginxlp expose deployment/my-nginx --type=NodePort
+
+Get URL of service
+
+	minikube service -n mynginxlp --url my-nginx
+
+Exec into pod
+	
+	kubectl -n mynginxlp exec -it pod/my-nginx-6f6c956ff6-h5wdm -- /bin/bash
+
+
+
+
+vi my-nginx-livenessprobe.yaml 
+kubectl delete ns mynginxlp
+kubectl create ns mynginxlp
+kubectl -n mynginxlp apply -f ./my-nginx-livenessprobe.yaml
+kubectl -n mynginxlp get all
+kubectl -n mynginxlp expose deployment/my-nginx --type=NodePort
+minikube service -n mynginxlp --url my-nginx
+kubectl -n mynginxlp exec -it pod/my-nginx-bcd9bbc4-7wv74 -- /bin/bash
